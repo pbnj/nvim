@@ -21,7 +21,6 @@ return {
     },
     {
       "https://github.com/nvim-telescope/telescope-github.nvim",
-      event = "VeryLazy",
       config = function()
         Util.on_load("telescope.nvim", function()
           require("telescope").load_extension("gh")
