@@ -1,6 +1,9 @@
 local Util = require("lazyvim.util")
 return {
   "nvim-telescope/telescope.nvim",
+  keys = {
+    { "<leader>gb", require("telescope.builtin").git_branches, desc = "Git Branches (Telescope)" },
+  },
   dependencies = {
     {
       "https://github.com/pbnj/telescope-urls.nvim",
