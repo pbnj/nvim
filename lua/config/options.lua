@@ -6,3 +6,4 @@ local opt = vim.opt
 opt.relativenumber = false
 opt.splitbelow = false
 opt.splitright = false
+opt.wildmode = { "full" }
