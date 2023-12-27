@@ -3,6 +3,7 @@ return {
   "nvim-telescope/telescope.nvim",
   keys = {
     { "<leader>gb", require("telescope.builtin").git_branches, desc = "Git Branches (Telescope)" },
+    { "<leader>fd", Util.telescope("files", { cwd = "~/.dotfiles/" }), desc = "Dotfiles" },
   },
   dependencies = {
     {
