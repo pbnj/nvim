@@ -4,6 +4,7 @@ return {
   keys = {
     { "<leader>gb", require("telescope.builtin").git_branches, desc = "Git Branches (Telescope)" },
     { "<leader>fd", Util.telescope("git_files", { cwd = "~/.dotfiles/" }), desc = "Dotfiles" },
+    { "<leader>fp", Util.telescope("find_files", { cwd = "~/Projects/", hidden = true }), desc = "Projects" },
   },
   dependencies = {
     {
