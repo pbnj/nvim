@@ -3,6 +3,7 @@
 -- Add any additional options here
 
 vim.g.netrw_keepdir = false
+vim.opt.conceallevel = 0
 vim.opt.relativenumber = false
 vim.opt.splitbelow = false
 vim.opt.splitright = false
