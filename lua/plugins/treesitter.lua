@@ -1,6 +1,6 @@
 return {
   "nvim-treesitter/nvim-treesitter",
-  dependencies = { "https://github.com/nvim-treesitter/nvim-treesitter-textobjects" },
+  dependencies = { "nvim-treesitter/nvim-treesitter-textobjects" },
   opts = {
     ensure_installed = {
       "bash",
