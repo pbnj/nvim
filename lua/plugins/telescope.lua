@@ -1,8 +1,34 @@
 local Util = require("lazyvim.util")
 return {
   "nvim-telescope/telescope.nvim",
+  config = function()
+    require("telescope").setup({
+      pickers = {
+        live_grep = {
+          additional_args = function()
+            return { "--hidden" }
+          end,
+        },
+      },
+    })
+  end,
   keys = {
-    { "<leader>gb", require("telescope.builtin").git_branches, desc = "Git Branches (Telescope)" },
+    { "<leader>gB", require("telescope.builtin").git_branches, desc = "Telescope git_branches" },
+    { "<leader>gC", require("telescope.builtin").git_commits, desc = "Telescope git_commits" },
+    {
+      "<leader>gb",
+      function()
+        vim.cmd("Git browse")
+      end,
+      desc = "Git browse",
+    },
+    {
+      "<leader>gc",
+      function()
+        vim.cmd("Git commit")
+      end,
+      desc = "Git commit",
+    },
     { "<leader>fd", Util.telescope("git_files", { cwd = "~/.dotfiles/" }), desc = "Dotfiles" },
   },
   dependencies = {
