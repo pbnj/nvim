@@ -33,7 +33,7 @@ return {
   },
   dependencies = {
     {
-      "https://github.com/pbnj/telescope-urls.nvim",
+      "pbnj/telescope-urls.nvim",
       keys = {
         {
           "<leader>fu",
@@ -50,10 +50,26 @@ return {
       end,
     },
     {
-      "https://github.com/nvim-telescope/telescope-github.nvim",
+      "nvim-telescope/telescope-github.nvim",
       config = function()
         Util.on_load("telescope.nvim", function()
           require("telescope").load_extension("gh")
+        end)
+      end,
+    },
+    {
+      "cappyzawa/telescope-terraform.nvim",
+      config = function()
+        Util.on_load("telescope.nvim", function()
+          require("telescope").load_extension("terraform")
+        end)
+      end,
+    },
+    {
+      "ANGkeith/telescope-terraform-doc.nvim",
+      config = function()
+        Util.on_load("telescope.nvim", function()
+          require("telescope").load_extension("terraform_doc")
         end)
       end,
     },
