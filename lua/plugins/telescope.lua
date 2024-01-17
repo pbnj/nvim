@@ -15,6 +15,8 @@ return {
   keys = {
     { "<leader>gB", require("telescope.builtin").git_branches, desc = "Telescope git_branches" },
     { "<leader>gC", require("telescope.builtin").git_commits, desc = "Telescope git_commits" },
+    { "<leader>;", require("telescope.builtin").command_history, desc = "Telescope command_history" },
+    { "<leader>:", require("telescope.builtin").commands, desc = "Telescope commands" },
     {
       "<leader>gb",
       function()
