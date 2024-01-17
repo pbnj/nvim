@@ -4,3 +4,15 @@
 vim.keymap.set("c", "<c-n>", "<c-Down>", { noremap = true, desc = "Next Cmdline History" })
 vim.keymap.set("c", "<c-p>", "<c-Up>", { noremap = true, desc = "Previous Cmdline History" })
 vim.keymap.set("t", "<esc>", [[<c-\><c-n>]], { desc = "Escape in Terminal Mode" })
+
+if vim.g.neovide then
+  vim.keymap.set("!", "<D-v>", "<C-R>+")
+  vim.keymap.set("", "<D-v>", "+p<CR>")
+  vim.keymap.set("c", "<D-v>", "<C-R>+")
+  vim.keymap.set("i", "<D-v>", "<C-R>+")
+  vim.keymap.set("n", "<D-s>", "<cmd>w<CR>")
+  vim.keymap.set("n", "<D-v>", '"+P')
+  vim.keymap.set("t", "<D-v>", "<C-R>+")
+  vim.keymap.set("v", "<D-c>", '"+y')
+  vim.keymap.set("v", "<D-v>", "<C-R>+")
+end

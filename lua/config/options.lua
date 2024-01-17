@@ -8,3 +8,4 @@ vim.opt.relativenumber = false
 vim.opt.splitbelow = false
 vim.opt.splitright = false
 vim.opt.wildmode = { "full" }
+vim.opt.guifont = { "Iosevka Nerd Font" }
