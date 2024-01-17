@@ -73,5 +73,30 @@ return {
         end)
       end,
     },
+    {
+      "nvim-telescope/telescope-project.nvim",
+      keys = {
+        {
+          "<leader>fp",
+          function()
+            require("telescope").extensions.project.project()
+          end,
+          desc = "Project Finder (Telescope)",
+        },
+      },
+      config = function()
+        Util.on_load("telescope.nvim", function()
+          require("telescope").setup({
+            extensions = {
+              project = {
+                base_dirs = { { path = "~/Projects", max_depth = 5 }, "~/.config/nvim", "~/.dotfiles" },
+                hidden_files = true,
+              },
+            },
+          })
+          require("telescope").load_extension("project")
+        end)
+      end,
+    },
   },
 }
