@@ -17,6 +17,7 @@ return {
     { "<leader>gC", require("telescope.builtin").git_commits, desc = "Telescope git_commits" },
     { "<leader>;", require("telescope.builtin").command_history, desc = "Telescope command_history" },
     { "<leader>:", require("telescope.builtin").commands, desc = "Telescope commands" },
+    { "<leader>fh", require("telescope.builtin").help_tags, desc = "Telescope help_tags" },
     {
       "<leader>gb",
       function()
