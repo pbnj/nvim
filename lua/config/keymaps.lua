@@ -7,12 +7,12 @@ vim.keymap.set("t", "<esc>", [[<c-\><c-n>]], { desc = "Escape in Terminal Mode" 
 
 if vim.g.neovide then
   vim.keymap.set("!", "<D-v>", "<C-R>+")
-  vim.keymap.set("", "<D-v>", "+p<CR>")
   vim.keymap.set("c", "<D-v>", "<C-R>+")
   vim.keymap.set("i", "<D-v>", "<C-R>+")
   vim.keymap.set("n", "<D-s>", "<cmd>w<CR>")
   vim.keymap.set("n", "<D-v>", '"+P')
-  vim.keymap.set("t", "<D-v>", "<C-R>+")
+  vim.keymap.set("n", "<D-]>", "gt")
+  vim.keymap.set("n", "<D-[>", "gT")
   vim.keymap.set("v", "<D-c>", '"+y')
   vim.keymap.set("v", "<D-v>", "<C-R>+")
 end
