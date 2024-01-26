@@ -23,15 +23,31 @@ return {
       end,
       desc = "git push --set-upstream origin",
     },
+    {
+      "<leader>gb",
+      function()
+        vim.cmd("GBrowse")
+      end,
+      desc = "GBrowse",
+    },
+    {
+      "<leader>gc",
+      function()
+        vim.cmd("Git commit")
+      end,
+      desc = "Git commit",
+    },
   },
   cmd = { "G", "Git", "Gwrite", "Gw", "GBrowse" },
   config = function()
     vim.api.nvim_create_autocmd("FileType", {
+      group = vim.api.nvim_create_augroup("lazyvim_pbnj_fugitive", { clear = true }),
       pattern = {
         "fugitive",
       },
-      callback = function()
-        vim.keymap.set("n", "q", "<cmd>q<cr>", { silent = true, buffer = true })
+      callback = function(event)
+        vim.bo[event.buf].buflisted = false
+        vim.keymap.set("n", "q", "<cmd>close<cr>", { silent = true, buffer = event.buf })
       end,
     })
   end,

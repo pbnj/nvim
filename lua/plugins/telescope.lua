@@ -2,7 +2,12 @@ local Util = require("lazyvim.util")
 return {
   "nvim-telescope/telescope.nvim",
   config = function()
-    require("telescope").setup({
+    local telescope = require("telescope")
+    telescope.setup({
+      extensions = {
+        terraform = {},
+        terraform_doc = {},
+      },
       pickers = {
         live_grep = {
           additional_args = function()
@@ -11,6 +16,10 @@ return {
         },
       },
     })
+    telescope.load_extension("gh")
+    telescope.load_extension("terraform")
+    telescope.load_extension("terraform_doc")
+    telescope.load_extension("urls")
   end,
   keys = {
     { "<leader>gB", require("telescope.builtin").git_branches, desc = "Telescope git_branches" },
@@ -18,88 +27,61 @@ return {
     { "<leader>;", require("telescope.builtin").command_history, desc = "Telescope command_history" },
     { "<leader>:", require("telescope.builtin").commands, desc = "Telescope commands" },
     { "<leader>fh", require("telescope.builtin").help_tags, desc = "Telescope help_tags" },
+    { "<leader>fp", Util.telescope("find_files", { hidden = true, cwd = "~/Projects/" }), desc = "Find Projects" },
     {
-      "<leader>gb",
+      "<leader>fgi",
       function()
-        vim.cmd("Git browse")
+        require("telescope").extensions.gh.issues()
       end,
-      desc = "Git browse",
+      desc = "Telescope gh issues",
     },
     {
-      "<leader>gc",
+      "<leader>fgr",
       function()
-        vim.cmd("Git commit")
+        require("telescope").extensions.gh.run()
       end,
-      desc = "Git commit",
+      desc = "Telescope gh run",
     },
-    { "<leader>fd", Util.telescope("git_files", { cwd = "~/.dotfiles/" }), desc = "Dotfiles" },
+    {
+      "<leader>fgp",
+      function()
+        require("telescope").extensions.gh.pull_request()
+      end,
+      desc = "Telescope gh pull_request",
+    },
+    {
+      "<leader>fgP",
+      function()
+        require("telescope").extensions.gh.pull_request_files()
+      end,
+      desc = "Telescope gh pull_request_files",
+    },
+    {
+      "<leader>fT",
+      function()
+        require("telescope").extensions.terraform.state_list()
+      end,
+      desc = "Telescope terraform state_list",
+    },
+    {
+      "<leader>ft",
+      function()
+        require("telescope").extensions.terraform_doc.terraform_doc()
+      end,
+      desc = "Telescope terraform_doc",
+    },
+    {
+      "<leader>fu",
+      function()
+        require("telescope").extensions.urls.urls()
+      end,
+      desc = "Find URLs",
+    },
   },
   dependencies = {
-    {
-      "pbnj/telescope-urls.nvim",
-      keys = {
-        {
-          "<leader>fu",
-          function()
-            require("telescope").extensions.urls.urls()
-          end,
-          desc = "Find URLs",
-        },
-      },
-      config = function()
-        Util.on_load("telescope.nvim", function()
-          require("telescope").load_extension("urls")
-        end)
-      end,
-    },
-    {
-      "nvim-telescope/telescope-github.nvim",
-      config = function()
-        Util.on_load("telescope.nvim", function()
-          require("telescope").load_extension("gh")
-        end)
-      end,
-    },
-    {
-      "cappyzawa/telescope-terraform.nvim",
-      config = function()
-        Util.on_load("telescope.nvim", function()
-          require("telescope").load_extension("terraform")
-        end)
-      end,
-    },
-    {
-      "ANGkeith/telescope-terraform-doc.nvim",
-      config = function()
-        Util.on_load("telescope.nvim", function()
-          require("telescope").load_extension("terraform_doc")
-        end)
-      end,
-    },
-    {
-      "nvim-telescope/telescope-project.nvim",
-      keys = {
-        {
-          "<leader>fp",
-          function()
-            require("telescope").extensions.project.project()
-          end,
-          desc = "Project Finder (Telescope)",
-        },
-      },
-      config = function()
-        Util.on_load("telescope.nvim", function()
-          require("telescope").setup({
-            extensions = {
-              project = {
-                base_dirs = { { path = "~/Projects", max_depth = 5 }, "~/.config/nvim", "~/.dotfiles" },
-                hidden_files = true,
-              },
-            },
-          })
-          require("telescope").load_extension("project")
-        end)
-      end,
-    },
+    { "ANGkeith/telescope-terraform-doc.nvim" },
+    { "cappyzawa/telescope-terraform.nvim" },
+    { "nvim-telescope/telescope-github.nvim" },
+    { "pbnj/telescope-urls.nvim" },
   },
 }

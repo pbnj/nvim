@@ -1,3 +1,1 @@
-return {
-  { "folke/noice.nvim", cond = not vim.g.neovide },
-}
+return { "folke/noice.nvim", cond = not vim.g.neovide }
