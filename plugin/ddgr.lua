@@ -3,8 +3,9 @@ if vim.g.loaded_ddgr == 1 then
 end
 vim.g.loaded_ddgr = 1
 
-local LazyTerm = require("lazyvim.util.terminal")
+local Terminal = require("toggleterm.terminal").Terminal
+local ddgr = Terminal:new({ cmd = "ddgr", hidden = true })
 
-vim.api.nvim_create_user_command("DDGR", function(opts)
-  LazyTerm.open(vim.tbl_flatten({ "ddgr", opts.fargs }))
-end, { nargs = "*" })
+vim.keymap.set("n", "<leader>dd", function()
+  ddgr:toggle(50)
+end, { desc = "DDGR" })
