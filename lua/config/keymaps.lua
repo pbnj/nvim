@@ -15,4 +15,6 @@ if vim.g.neovide then
   vim.keymap.set("n", "<D-[>", "gT")
   vim.keymap.set("v", "<D-c>", '"+y')
   vim.keymap.set("v", "<D-v>", "<C-R>+")
+  vim.keymap.set("t", "<s-space>", " ")
+  vim.keymap.set("t", "<s-cr>", "<cr>")
 end
