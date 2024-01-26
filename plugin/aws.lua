@@ -3,9 +3,12 @@ if vim.g.loaded_aws == 1 then
 end
 vim.g.loaded_aws = 1
 
-local LazyTerm = require("lazyvim.util.terminal")
+local Terminal = require("toggleterm.terminal").Terminal
 
-local aws_profiles = [[awk -F '[][]' '{print $2}' ~/.aws/config | awk 'NF > 0 {print $2}']]
+local aws_profiles = function()
+  return vim.fn.systemlist([[awk -F '[][]' '{print $2}' ~/.aws/config | awk 'NF > 0 {print $2}']])
+end
+
 local aws_subcmd = {
   "accessanalyzer",
   "account",
@@ -370,29 +373,48 @@ local aws_subcmd = {
   "help",
 }
 
+local aws = function(...)
+  return { "aws", ... }
+end
+
+local aws_interactive = function(...)
+  return aws("--cli-auto-prompt", ...)
+end
+
 vim.api.nvim_create_user_command("AWS", function()
-  vim.ui.select(vim.fn.systemlist(aws_profiles), { prompt = "AWS Profiles" }, function(choice)
-    local aws_interactive = { "aws", "--cli-auto-prompt" }
-    if choice == nil then
+  vim.ui.select(aws_profiles(), { prompt = "AWS Profiles" }, function(profile)
+    if not profile then
+      vim.notify("AWS Profile cancelled")
       return
     end
-    aws_interactive = vim.list_extend(aws_interactive, { "--profile", choice })
-    vim.ui.select(aws_subcmd, { prompt = "AWS Sub-Command" }, function(choice_subcmd)
-      aws_interactive = vim.list_extend(aws_interactive, { choice_subcmd })
-      LazyTerm.open(aws_interactive)
+    vim.ui.select(aws_subcmd, { prompt = "AWS Sub-Command" }, function(subcmd)
+      if not subcmd then
+        vim.notify("AWS Sub-Command cancelled")
+        return
+      end
+      Terminal:new({ cmd = table.concat(aws_interactive("--profile", profile, subcmd), " "), close_on_exit = false })
+        :toggle()
     end)
   end)
 end, { desc = "Interactive AWS CLI" })
 
 vim.api.nvim_create_user_command("AWSLogin", function()
-  vim.ui.select(vim.fn.systemlist(aws_profiles), { prompt = "AWS Profile" }, function(choice)
-    LazyTerm.open({ "aws", "sso", "login", "--profile", choice })
+  vim.ui.select(aws_profiles(), { prompt = "AWS Profile" }, function(profile)
+    if not profile then
+      vim.notify("AWS Profile cancelled")
+      return
+    end
+    vim.notify(vim.system({ "aws", "sso", "login", "--profile", profile }):wait().stdout)
   end)
 end, { desc = "AWS SSO Login" })
 
 vim.api.nvim_create_user_command("AWSConsole", function()
-  vim.ui.select(vim.fn.systemlist(aws_profiles), { prompt = "AWS Profile" }, function(choice)
-    local aws_console = vim.list_extend({ "aws-console" }, { "-p", choice })
-    LazyTerm.open(aws_console)
+  vim.ui.select(aws_profiles(), { prompt = "AWS Profile" }, function(profile)
+    if not profile then
+      vim.notify("AWS Profile cancelled")
+      return
+    end
+    vim.notify(vim.system({ "aws", "sso", "login", "--profile", profile }):wait().stdout)
+    vim.notify(vim.system({ "aws-console", "-p", profile }):wait().stdout)
   end)
 end, { desc = "Launch AWS web console" })
