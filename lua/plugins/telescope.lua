@@ -19,7 +19,6 @@ return {
     telescope.load_extension("gh")
     telescope.load_extension("terraform")
     telescope.load_extension("terraform_doc")
-    telescope.load_extension("urls")
   end,
   keys = {
     { "<leader>gB", require("telescope.builtin").git_branches, desc = "Telescope git_branches" },
@@ -70,18 +69,12 @@ return {
       end,
       desc = "Telescope terraform_doc",
     },
-    {
-      "<leader>fu",
-      function()
-        require("telescope").extensions.urls.urls()
-      end,
-      desc = "Find URLs",
+      desc = "Pull Request Files (Telescope gh pull_request_files)",
     },
   },
   dependencies = {
     { "ANGkeith/telescope-terraform-doc.nvim" },
     { "cappyzawa/telescope-terraform.nvim" },
     { "nvim-telescope/telescope-github.nvim" },
-    { "pbnj/telescope-urls.nvim" },
   },
 }
