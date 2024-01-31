@@ -5,416 +5,51 @@ vim.g.loaded_aws = 1
 
 local Terminal = require("toggleterm.terminal").Terminal
 
-local aws_profiles = function()
-  return vim.fn.systemlist([[awk -F '[][]' '{print $2}' ~/.aws/config | awk 'NF > 0 {print $2}']])
-end
-
-local aws_subcmd = {
-  "accessanalyzer",
-  "account",
-  "acm",
-  "acm-pca",
-  "alexaforbusiness",
-  "amp",
-  "amplify",
-  "amplifybackend",
-  "amplifyuibuilder",
-  "apigateway",
-  "apigatewaymanagementapi",
-  "apigatewayv2",
-  "appconfig",
-  "appconfigdata",
-  "appfabric",
-  "appflow",
-  "appintegrations",
-  "application-autoscaling",
-  "application-insights",
-  "applicationcostprofiler",
-  "appmesh",
-  "apprunner",
-  "appstream",
-  "appsync",
-  "arc-zonal-shift",
-  "athena",
-  "auditmanager",
-  "autoscaling",
-  "autoscaling-plans",
-  "backup",
-  "backup-gateway",
-  "backupstorage",
-  "batch",
-  "billingconductor",
-  "braket",
-  "budgets",
-  "ce",
-  "chime",
-  "chime-sdk-identity",
-  "chime-sdk-media-pipelines",
-  "chime-sdk-meetings",
-  "chime-sdk-messaging",
-  "chime-sdk-voice",
-  "cleanrooms",
-  "cloud9",
-  "cloudcontrol",
-  "clouddirectory",
-  "cloudformation",
-  "cloudfront",
-  "cloudhsm",
-  "cloudhsmv2",
-  "cloudsearch",
-  "cloudsearchdomain",
-  "cloudtrail",
-  "cloudtrail-data",
-  "cloudwatch",
-  "codeartifact",
-  "codebuild",
-  "codecatalyst",
-  "codecommit",
-  "codeguru-reviewer",
-  "codeguru-security",
-  "codeguruprofiler",
-  "codepipeline",
-  "codestar",
-  "codestar-connections",
-  "codestar-notifications",
-  "cognito-identity",
-  "cognito-idp",
-  "cognito-sync",
-  "comprehend",
-  "comprehendmedical",
-  "compute-optimizer",
-  "connect",
-  "connect-contact-lens",
-  "connectcampaigns",
-  "connectcases",
-  "connectparticipant",
-  "controltower",
-  "cur",
-  "customer-profiles",
-  "databrew",
-  "dataexchange",
-  "datapipeline",
-  "datasync",
-  "dax",
-  "detective",
-  "devicefarm",
-  "devops-guru",
-  "directconnect",
-  "discovery",
-  "dlm",
-  "dms",
-  "docdb",
-  "docdb-elastic",
-  "drs",
-  "ds",
-  "dynamodb",
-  "dynamodbstreams",
-  "ebs",
-  "ec2",
-  "ec2-instance-connect",
-  "ecr",
-  "ecr-public",
-  "ecs",
-  "efs",
-  "eks",
-  "elastic-inference",
-  "elasticache",
-  "elasticbeanstalk",
-  "elastictranscoder",
-  "elb",
-  "elbv2",
-  "emr",
-  "emr-containers",
-  "emr-serverless",
-  "entityresolution",
-  "es",
-  "events",
-  "evidently",
-  "finspace",
-  "finspace-data",
-  "firehose",
-  "fis",
-  "fms",
-  "forecast",
-  "forecastquery",
-  "frauddetector",
-  "fsx",
-  "gamelift",
-  "gamesparks",
-  "glacier",
-  "globalaccelerator",
-  "glue",
-  "grafana",
-  "greengrass",
-  "greengrassv2",
-  "groundstation",
-  "guardduty",
-  "health",
-  "healthlake",
-  "honeycode",
-  "iam",
-  "identitystore",
-  "imagebuilder",
-  "importexport",
-  "inspector",
-  "inspector2",
-  "internetmonitor",
-  "iot",
-  "iot-data",
-  "iot-jobs-data",
-  "iot-roborunner",
-  "iot1click-devices",
-  "iot1click-projects",
-  "iotanalytics",
-  "iotdeviceadvisor",
-  "iotevents",
-  "iotevents-data",
-  "iotfleethub",
-  "iotfleetwise",
-  "iotsecuretunneling",
-  "iotsitewise",
-  "iotthingsgraph",
-  "iottwinmaker",
-  "iotwireless",
-  "ivs",
-  "ivs-realtime",
-  "ivschat",
-  "kafka",
-  "kafkaconnect",
-  "kendra",
-  "kendra-ranking",
-  "keyspaces",
-  "kinesis",
-  "kinesis-video-archived-media",
-  "kinesis-video-media",
-  "kinesis-video-signaling",
-  "kinesis-video-webrtc-storage",
-  "kinesisanalytics",
-  "kinesisanalyticsv2",
-  "kinesisvideo",
-  "kms",
-  "lakeformation",
-  "lambda",
-  "lex-models",
-  "lex-runtime",
-  "lexv2-models",
-  "lexv2-runtime",
-  "license-manager",
-  "license-manager-linux-subscriptions",
-  "license-manager-user-subscriptions",
-  "lightsail",
-  "location",
-  "logs",
-  "lookoutequipment",
-  "lookoutmetrics",
-  "lookoutvision",
-  "m2",
-  "machinelearning",
-  "macie",
-  "macie2",
-  "managedblockchain",
-  "managedblockchain-query",
-  "marketplace-catalog",
-  "marketplace-entitlement",
-  "marketplacecommerceanalytics",
-  "mediaconnect",
-  "mediaconvert",
-  "medialive",
-  "mediapackage",
-  "mediapackage-vod",
-  "mediapackagev2",
-  "mediastore",
-  "mediastore-data",
-  "mediatailor",
-  "medical-imaging",
-  "memorydb",
-  "meteringmarketplace",
-  "mgh",
-  "mgn",
-  "migration-hub-refactor-spaces",
-  "migrationhub-config",
-  "migrationhuborchestrator",
-  "migrationhubstrategy",
-  "mobile",
-  "mq",
-  "mturk",
-  "mwaa",
-  "neptune",
-  "neptunedata",
-  "network-firewall",
-  "networkmanager",
-  "nimble",
-  "oam",
-  "omics",
-  "opensearch",
-  "opensearchserverless",
-  "opsworks",
-  "opsworkscm",
-  "organizations",
-  "osis",
-  "outposts",
-  "panorama",
-  "payment-cryptography",
-  "payment-cryptography-data",
-  "pca-connector-ad",
-  "personalize",
-  "personalize-events",
-  "personalize-runtime",
-  "pi",
-  "pinpoint",
-  "pinpoint-email",
-  "pinpoint-sms-voice",
-  "pinpoint-sms-voice-v2",
-  "pipes",
-  "polly",
-  "pricing",
-  "privatenetworks",
-  "proton",
-  "qldb",
-  "qldb-session",
-  "quicksight",
-  "ram",
-  "rbin",
-  "rds",
-  "rds-data",
-  "redshift",
-  "redshift-data",
-  "redshift-serverless",
-  "rekognition",
-  "resiliencehub",
-  "resource-explorer-2",
-  "resource-groups",
-  "resourcegroupstaggingapi",
-  "robomaker",
-  "rolesanywhere",
-  "route53",
-  "route53-recovery-cluster",
-  "route53-recovery-control-config",
-  "route53-recovery-readiness",
-  "route53domains",
-  "route53resolver",
-  "rum",
-  "s3control",
-  "s3outposts",
-  "sagemaker",
-  "sagemaker-a2i-runtime",
-  "sagemaker-edge",
-  "sagemaker-featurestore-runtime",
-  "sagemaker-geospatial",
-  "sagemaker-metrics",
-  "sagemaker-runtime",
-  "savingsplans",
-  "scheduler",
-  "schemas",
-  "sdb",
-  "secretsmanager",
-  "securityhub",
-  "securitylake",
-  "serverlessrepo",
-  "service-quotas",
-  "servicecatalog",
-  "servicecatalog-appregistry",
-  "servicediscovery",
-  "ses",
-  "sesv2",
-  "shield",
-  "signer",
-  "simspaceweaver",
-  "sms",
-  "snow-device-management",
-  "snowball",
-  "sns",
-  "sqs",
-  "ssm",
-  "ssm-contacts",
-  "ssm-incidents",
-  "ssm-sap",
-  "sso",
-  "sso-admin",
-  "sso-oidc",
-  "stepfunctions",
-  "storagegateway",
-  "sts",
-  "support",
-  "support-app",
-  "swf",
-  "synthetics",
-  "textract",
-  "timestream-query",
-  "timestream-write",
-  "tnb",
-  "transcribe",
-  "transfer",
-  "translate",
-  "verifiedpermissions",
-  "voice-id",
-  "vpc-lattice",
-  "waf",
-  "waf-regional",
-  "wafv2",
-  "wellarchitected",
-  "wisdom",
-  "workdocs",
-  "worklink",
-  "workmail",
-  "workmailmessageflow",
-  "workspaces",
-  "workspaces-web",
-  "xray",
-  "s3api",
-  "s3",
-  "ddb",
-  "configure",
-  "deploy",
-  "configservice",
-  "opsworks-cm",
-  "history",
-  "cli-dev",
-  "help",
-}
-
-local aws = function(...)
-  return { "aws", ... }
-end
-
-local aws_interactive = function(...)
-  return aws("--cli-auto-prompt", ...)
-end
-
-vim.api.nvim_create_user_command("AWS", function()
-  vim.ui.select(aws_profiles(), { prompt = "AWS Profiles" }, function(profile)
-    if not profile then
-      vim.notify("AWS Profile cancelled")
-      return
-    end
-    vim.ui.select(aws_subcmd, { prompt = "AWS Sub-Command" }, function(subcmd)
-      if not subcmd then
-        vim.notify("AWS Sub-Command cancelled")
-        return
-      end
-      Terminal:new({ cmd = table.concat(aws_interactive("--profile", profile, subcmd), " "), close_on_exit = false })
-        :toggle()
-    end)
-  end)
-end, { desc = "Interactive AWS CLI" })
+local aws_profiles = vim.fn.systemlist([[rg '\[profile (.*)\]' -or '$1' ~/.aws/config]])
 
 vim.api.nvim_create_user_command("AWSLogin", function()
-  vim.ui.select(aws_profiles(), { prompt = "AWS Profile" }, function(profile)
-    if not profile then
-      vim.notify("AWS Profile cancelled")
-      return
+  vim.ui.select(aws_profiles, { prompt = "AWS Profile" }, function(profile)
+    if profile then
+      local res = vim.system({ "aws", "sso", "login", "--profile", profile }):wait()
+      if res.code ~= 0 then
+        vim.notify(res.stderr, vim.log.levels.ERROR)
+      end
+      vim.notify(res.stdout)
     end
-    vim.notify(vim.system({ "aws", "sso", "login", "--profile", profile }):wait().stdout)
   end)
 end, { desc = "AWS SSO Login" })
 
 vim.api.nvim_create_user_command("AWSConsole", function()
-  vim.ui.select(aws_profiles(), { prompt = "AWS Profile" }, function(profile)
-    if not profile then
-      vim.notify("AWS Profile cancelled")
-      return
+  vim.ui.select(aws_profiles, { prompt = "AWS Profile" }, function(profile)
+    if profile then
+      local sso = vim.system({ "aws", "sso", "login", "--profile", profile }):wait()
+      if sso.code ~= 0 then
+        vim.notify(sso.stderr, vim.log.levels.ERROR)
+      end
+      local console = vim.system({ "aws-console", "-p", profile }):wait()
+      if console.code ~= 0 then
+        vim.notify(console.stderr, vim.log.levels.ERROR)
+      end
     end
-    vim.notify(vim.system({ "aws", "sso", "login", "--profile", profile }):wait().stdout)
-    vim.notify(vim.system({ "aws-console", "-p", profile }):wait().stdout)
   end)
 end, { desc = "Launch AWS web console" })
+
+vim.api.nvim_create_user_command("AWSGimmeCreds", function()
+  vim.ui.input({ prompt = "AWS IAM Roles" }, function(role)
+    local cmd = "gimme-aws-creds"
+    if role then
+      cmd = string.format("gimme-aws-creds --roles /%s/", role)
+    end
+    Terminal:new({ cmd = cmd, close_on_exit = false }):toggle()
+  end)
+end, { desc = "gimme-aws-creds" })
+
+vim.api.nvim_create_user_command("AWSWhich", function()
+  local aws_profile_id = vim.fn.systemlist([[sed -nr 's/\[profile (.*)\] # (.*)/\1 : \2/p' ~/.aws/config]])
+  vim.ui.select(aws_profile_id, { prompt = "Find AWS Account by ID or Alias" }, function(acct)
+    if acct then
+      vim.notify(acct)
+      vim.fn.setreg("*", acct)
+    end
+  end)
+end, { desc = "Find AWS Account by ID or Alias" })
