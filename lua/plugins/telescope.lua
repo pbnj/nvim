@@ -21,54 +21,35 @@ return {
     telescope.load_extension("terraform_doc")
   end,
   keys = {
-    { "<leader>gB", require("telescope.builtin").git_branches, desc = "Telescope git_branches" },
-    { "<leader>gC", require("telescope.builtin").git_commits, desc = "Telescope git_commits" },
-    { "<leader>;", require("telescope.builtin").command_history, desc = "Telescope command_history" },
-    { "<leader>:", require("telescope.builtin").commands, desc = "Telescope commands" },
-    { "<leader>fh", require("telescope.builtin").help_tags, desc = "Telescope help_tags" },
-    { "<leader>fp", Util.telescope("find_files", { hidden = true, cwd = "~/Projects/" }), desc = "Find Projects" },
+    { "<leader>fp", Util.telescope("find_files", { hidden = true, cwd = "~/Projects/" }), desc = "Find in Projects" },
+    { "<leader>fd", Util.telescope("find_files", { hidden = true, cwd = "~/.dotfiles/" }), desc = "Find in Dotfiles" },
+    { "<leader>gb", require("telescope.builtin").git_branches, desc = "Branches (Telescope git_branches)" },
     {
-      "<leader>fgi",
+      "<leader>gI",
       function()
         require("telescope").extensions.gh.issues()
       end,
-      desc = "Telescope gh issues",
+      desc = "Issues (Telescope gh issues)",
     },
     {
-      "<leader>fgr",
+      "<leader>gR",
       function()
         require("telescope").extensions.gh.run()
       end,
-      desc = "Telescope gh run",
+      desc = "Runs (Telescope gh run)",
     },
     {
-      "<leader>fgp",
+      "<leader>gP",
       function()
         require("telescope").extensions.gh.pull_request()
       end,
-      desc = "Telescope gh pull_request",
+      desc = "Pull Requests (Telescope gh pull_request)",
     },
     {
-      "<leader>fgP",
+      "<leader>gF",
       function()
         require("telescope").extensions.gh.pull_request_files()
       end,
-      desc = "Telescope gh pull_request_files",
-    },
-    {
-      "<leader>fT",
-      function()
-        require("telescope").extensions.terraform.state_list()
-      end,
-      desc = "Telescope terraform state_list",
-    },
-    {
-      "<leader>ft",
-      function()
-        require("telescope").extensions.terraform_doc.terraform_doc()
-      end,
-      desc = "Telescope terraform_doc",
-    },
       desc = "Pull Request Files (Telescope gh pull_request_files)",
     },
   },

@@ -14,28 +14,28 @@ return {
       function()
         vim.cmd("Gwrite")
       end,
-      desc = "Git Add Current Buffer",
+      desc = "Stage current buffer (git add)",
     },
     {
       "<leader>gp",
       function()
         vim.cmd("Git push --set-upstream origin")
       end,
-      desc = "git push --set-upstream origin",
+      desc = "Push (git push --set-upstream origin)",
     },
     {
-      "<leader>gb",
+      "<leader>gB",
       function()
         vim.cmd("GBrowse")
       end,
-      desc = "GBrowse",
+      desc = "Browse repo in browser (GBrowse)",
     },
     {
-      "<leader>gc",
+      "<leader>gC",
       function()
         vim.cmd("Git commit")
       end,
-      desc = "Git commit",
+      desc = "Commit (git commit)",
     },
   },
   cmd = { "G", "Git", "Gwrite", "Gw", "GBrowse" },
