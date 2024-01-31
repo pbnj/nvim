@@ -1,16 +1,3 @@
-local function openURL(url)
-  local opener
-  if vim.fn.has("macunix") == 1 then
-    opener = "open"
-  elseif vim.fn.has("linux") == 1 then
-    opener = "xdg-open"
-  elseif vim.fn.has("win64") == 1 or vim.fn.has("win32") == 1 then
-    opener = "start"
-  end
-  local openCommand = string.format("%s '%s' >/dev/null 2>&1", opener, url)
-  vim.fn.system(openCommand)
-end
-
 return {
   "chrisgrieser/nvim-various-textobjs",
   lazy = true,
@@ -22,7 +9,9 @@ return {
       if foundURL then
         vim.cmd.normal({ '"zy', bang = true })
         local url = vim.fn.getreg("z")
-        openURL(url)
+        if url then
+          vim.ui.open(url)
+        end
       else
         -- find all URLs in buffer
         local urlPattern = require("various-textobjs.charwise-textobjs").urlPattern
@@ -38,7 +27,7 @@ return {
         -- `vim.ui.select`
         vim.ui.select(urls, { prompt = "Select URL:" }, function(url)
           if url then
-            openURL(url)
+            vim.ui.open(url)
           end
         end)
       end
