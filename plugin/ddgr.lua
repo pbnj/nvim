@@ -3,19 +3,11 @@ if vim.g.loaded_ddgr == 1 then
 end
 vim.g.loaded_ddgr = 1
 
-local Terminal = require("toggleterm.terminal").Terminal
-local ddgr = function(...)
-  local cmd = table.concat({ "ddgr", ... }, " ")
-  return Terminal:new({ cmd = cmd })
-end
-
-vim.api.nvim_create_user_command("Lofi", function(opts)
-  local args = opts.args or "lofi"
-  ddgr("--url-handler", "mpv", "--site", "youtube.com", args):toggle(40)
-end, { desc = "Search and play LoFi from YT with DDGR + MPV", nargs = "*" })
+local LazyTerm = require("lazyvim.util.terminal")
 
 vim.api.nvim_create_user_command("DD", function(opts)
-  ddgr(opts.args):toggle(40)
+  local cmd = vim.tbl_flatten({ "ddgr", opts.fargs })
+  LazyTerm.open(cmd)
 end, { desc = "Search with DDGR", nargs = "*" })
 
 vim.api.nvim_create_user_command("YT", function(opts)
@@ -26,7 +18,3 @@ vim.api.nvim_create_user_command("YT", function(opts)
     vim.notify(res.stdout, vim.log.levels.INFO)
   end
 end, { desc = "Search YT with DDGR", nargs = "*" })
-
-vim.keymap.set("n", "<leader>dd", function()
-  ddgr():toggle(40)
-end, { desc = "DDGR" })

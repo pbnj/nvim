@@ -3,7 +3,7 @@ if vim.g.loaded_aws == 1 then
 end
 vim.g.loaded_aws = 1
 
-local Terminal = require("toggleterm.terminal").Terminal
+local LazyTerm = require("lazyvim.util.terminal")
 
 local aws_profiles = vim.fn.systemlist([[rg '\[profile (.*)\]' -or '$1' ~/.aws/config]])
 
@@ -34,22 +34,21 @@ vim.api.nvim_create_user_command("AWSConsole", function()
   end)
 end, { desc = "Launch AWS web console" })
 
-vim.api.nvim_create_user_command("AWSGimmeCreds", function()
-  vim.ui.input({ prompt = "AWS IAM Roles" }, function(role)
-    local cmd = "gimme-aws-creds"
-    if role then
-      cmd = string.format("gimme-aws-creds --roles /%s/", role)
-    end
-    Terminal:new({ cmd = cmd, close_on_exit = false }):toggle()
-  end)
-end, { desc = "gimme-aws-creds" })
+vim.api.nvim_create_user_command("AWSGimmeCreds", function(opts)
+  local role = opts.args
+  if role == nil or role == "" then
+    role = "secops"
+  end
+  local cmd = { "gimme-aws-creds", "--roles", string.format("/%s/", role) }
+  LazyTerm.open(cmd, { interactive = false })
+end, { desc = "gimme-aws-creds", nargs = "?" })
 
 vim.api.nvim_create_user_command("AWSWhich", function()
   local aws_profile_id = vim.fn.systemlist([[sed -nr 's/\[profile (.*)\] # (.*)/\1 : \2/p' ~/.aws/config]])
   vim.ui.select(aws_profile_id, { prompt = "Find AWS Account by ID or Alias" }, function(acct)
     if acct then
       vim.notify(acct)
-      vim.fn.setreg("*", acct)
+      vim.fn.setreg("+", acct)
     end
   end)
 end, { desc = "Find AWS Account by ID or Alias" })

@@ -1,16 +1,13 @@
-if vim.g.loaded_gh == 1 then
+if vim.g.loaded_tmux == 1 then
   return
 end
-vim.g.loaded_gh = 1
+vim.g.loaded_tmux = 1
 
-local Terminal = require("toggleterm.terminal").Terminal
-local gh = function(...)
-  local cmd = table.concat({ "gh", ... }, " ")
-  return Terminal:new({ cmd = cmd, close_on_exit = false, direction = "float" })
-end
+local LazyTerm = require("lazyvim.util.terminal")
 
 vim.api.nvim_create_user_command("GH", function(opts)
-  gh(opts.args):toggle()
+  local cmd = vim.tbl_flatten({ "gh", opts.fargs })
+  LazyTerm.open(cmd)
 end, { desc = "GH CLI", nargs = "*" })
 
 vim.api.nvim_create_user_command("GHClone", function()
