@@ -12,21 +12,19 @@ vim.api.nvim_create_autocmd("FileType", {
   callback = function()
     local wk = require("which-key")
     wk.register({
-      ["<leader>"] = {
-        t = {
-          name = "+Terraform",
-          s = {
-            function()
-              require("telescope").extensions.terraform.state_list()
-            end,
-            "State (Telescope terraform state_list)",
-          },
-          d = {
-            function()
-              require("telescope").extensions.terraform_doc.terraform_doc()
-            end,
-            "Docs (Telescope terraform_doc)",
-          },
+      ["<leader>ct"] = {
+        name = "+Terraform",
+        s = {
+          function()
+            require("telescope").extensions.terraform.state_list()
+          end,
+          "State (Telescope terraform state_list)",
+        },
+        d = {
+          function()
+            require("telescope").extensions.terraform_doc.terraform_doc()
+          end,
+          "Docs (Telescope terraform_doc)",
         },
       },
     })
