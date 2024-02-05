@@ -1,11 +1,8 @@
-tt.*
-.tests
-doc/tags
-debug
-.repro
-foo.*
 *.log
+.repro
+.tests
 data
+debug
+tags*
 lazy-lock.json
 spell/
-snyk-ls.lua
