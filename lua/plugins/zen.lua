@@ -10,6 +10,9 @@ return {
       },
     },
     plugins = {
+      options = {
+        showcmd = true,
+      },
       tmux = {
         enabled = true,
       },

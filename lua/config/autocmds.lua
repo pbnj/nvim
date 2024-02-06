@@ -2,13 +2,9 @@
 -- Default autocmds that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/autocmds.lua
 -- Add any additional autocmds here
 
-local function augroup(name)
-  return vim.api.nvim_create_augroup("lazyvim_pbnj_terraform_" .. name, { clear = true })
-end
-
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "terraform",
-  group = augroup("keymap"),
+  group = vim.api.nvim_create_augroup("lazyvim_pbnj_terraform_keymap", { clear = true }),
   callback = function()
     local wk = require("which-key")
     wk.register({
