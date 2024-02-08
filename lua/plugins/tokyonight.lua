@@ -1,1 +1,1 @@
-return { "folke/tokyonight.nvim", opts = { transparent = true } }
+return { "folke/tokyonight.nvim", opts = {} }
