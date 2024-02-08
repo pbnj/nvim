@@ -4,6 +4,8 @@
 vim.keymap.set("c", "<c-n>", "<c-Down>", { noremap = true, desc = "Next Cmdline History" })
 vim.keymap.set("c", "<c-p>", "<c-Up>", { noremap = true, desc = "Previous Cmdline History" })
 vim.keymap.set("t", "<esc>", [[<c-\><c-n>]], { desc = "Escape in Terminal Mode" })
+vim.keymap.set("v", "<c-j>", ":m '>+1<CR>gv=gv", { desc = "Move visual line down & reindent" })
+vim.keymap.set("v", "<c-k>", ":m '<-2<CR>gv=gv", { desc = "Move visual line up & reindent" })
 
 if vim.g.neovide then
   vim.keymap.set("!", "<D-v>", "<C-R>+")
