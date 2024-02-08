@@ -34,9 +34,6 @@ return {
     telescope.load_extension("file_browser")
   end,
   keys = {
-    { "<leader>fe", require("telescope").extensions.file_browser.file_browser, desc = "File Explorer" },
-    { "<leader>gf", require("telescope.builtin").git_files, desc = "Git Files" },
-    { "<leader>gb", require("telescope.builtin").git_branches, desc = "Git Branches" },
     {
       "<leader>ff",
       function()
@@ -57,6 +54,27 @@ return {
         require("telescope").extensions.file_browser.file_browser({ cwd = "~/Projects/" })
       end,
       desc = "Find in Projects",
+    },
+    {
+      "<leader>fe",
+      function()
+        require("telescope").extensions.file_browser.file_browser()
+      end,
+      desc = "File Explorer",
+    },
+    {
+      "<leader>gf",
+      function()
+        require("telescope.builtin").git_files()
+      end,
+      desc = "Git Files",
+    },
+    {
+      "<leader>gb",
+      function()
+        require("telescope.builtin").git_branches()
+      end,
+      desc = "Git Branches",
     },
     {
       "<leader>gI",
