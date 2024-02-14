@@ -4,19 +4,11 @@ return {
     { "ANGkeith/telescope-terraform-doc.nvim" },
     { "cappyzawa/telescope-terraform.nvim" },
     { "nvim-telescope/telescope-github.nvim" },
-    { "nvim-telescope/telescope-file-browser.nvim" },
   },
   config = function()
     local telescope = require("telescope")
     telescope.setup({
       extensions = {
-        file_browser = {
-          hidden = true,
-          hijack_netrw = true,
-          hide_parent_dir = true,
-          grouped = true,
-          prompt_path = true,
-        },
         terraform = {},
         terraform_doc = {},
       },
@@ -31,7 +23,6 @@ return {
     telescope.load_extension("gh")
     telescope.load_extension("terraform")
     telescope.load_extension("terraform_doc")
-    telescope.load_extension("file_browser")
   end,
   keys = {
     {
@@ -51,16 +42,9 @@ return {
     {
       "<leader>fp",
       function()
-        require("telescope").extensions.file_browser.file_browser({ cwd = "~/Projects/" })
+        require("telescope.builtin").find_files({ cwd = "~/Projects/", hidden = true })
       end,
       desc = "Find in Projects",
-    },
-    {
-      "<leader>fe",
-      function()
-        require("telescope").extensions.file_browser.file_browser()
-      end,
-      desc = "File Explorer",
     },
     {
       "<leader>gf",
