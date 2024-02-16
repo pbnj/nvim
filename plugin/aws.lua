@@ -44,8 +44,8 @@ vim.api.nvim_create_user_command("AWSGimmeCreds", function(opts)
 end, { desc = "gimme-aws-creds", nargs = "?" })
 
 vim.api.nvim_create_user_command("AWSWhich", function()
-  local aws_profile_id = vim.fn.systemlist([[sed -nr 's/\[profile (.*)\] # (.*)/\1 : \2/p' ~/.aws/config]])
-  vim.ui.select(aws_profile_id, { prompt = "Find AWS Account by ID or Alias" }, function(acct)
+  -- local aws_profile_id = vim.fn.systemlist([[sed -nr 's/\[profile (.*)\] # (.*)/\1 : \2/p' ~/.aws/config]])
+  vim.ui.select(aws_profiles, { prompt = "Find AWS Account by ID or Alias" }, function(acct)
     if acct then
       vim.notify(acct)
       vim.fn.setreg("+", acct)
