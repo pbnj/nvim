@@ -3,7 +3,9 @@ if vim.g.loaded_aws == 1 then
 end
 vim.g.loaded_aws = 1
 
-local Terminal = require("toggleterm.terminal").Terminal
+local terminal = function()
+  return require("toggleterm.terminal").Terminal
+end
 
 local aws_profiles = function()
   return vim.fn.systemlist([[rg '\[profile (.*)\]' -or '$1' ~/.aws/config]])
@@ -42,7 +44,7 @@ vim.api.nvim_create_user_command("AWSGimmeCreds", function(opts)
     role = "secops"
   end
   local cmd = { "gimme-aws-creds", "--roles", string.format("/%s/", role) }
-  Terminal:new({ cmd = table.concat(cmd, " "), hidden = false }):toggle()
+  terminal():new({ cmd = table.concat(cmd, " "), hidden = false }):toggle()
 end, { desc = "gimme-aws-creds", nargs = "?" })
 
 vim.api.nvim_create_user_command("AWSWhich", function()

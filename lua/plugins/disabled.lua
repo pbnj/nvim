@@ -7,4 +7,5 @@ return {
   { "nvim-treesitter/nvim-treesitter-context", enabled = false },
   { "RRethy/vim-illuminate", enabled = false },
   { "lukas-reineke/headlines.nvim", enabled = false },
+  { "nvimdev/dashboard-nvim", enabled = false },
 }
