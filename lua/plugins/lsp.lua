@@ -16,14 +16,6 @@ return {
           token = vim.env.SNYK_TOKEN,
         },
       },
-      -- temporary fix for https://github.com/hashicorp/terraform-ls/issues/1655
-      terraformls = {
-        init_options = {
-          terraform = {
-            path = vim.fs.normalize("~/.local/share/nvim/mason/bin/terraform-ls"),
-          },
-        },
-      },
     },
   },
 }
