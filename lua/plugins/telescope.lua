@@ -1,17 +1,11 @@
 return {
   "nvim-telescope/telescope.nvim",
   dependencies = {
-    { "ANGkeith/telescope-terraform-doc.nvim" },
-    { "cappyzawa/telescope-terraform.nvim" },
     { "nvim-telescope/telescope-github.nvim" },
   },
   config = function()
     local telescope = require("telescope")
     telescope.setup({
-      extensions = {
-        terraform = {},
-        terraform_doc = {},
-      },
       pickers = {
         live_grep = {
           additional_args = function()
@@ -21,8 +15,27 @@ return {
       },
     })
     telescope.load_extension("gh")
-    telescope.load_extension("terraform")
-    telescope.load_extension("terraform_doc")
+    require("which-key").register({
+      ["<leader>ct"] = { name = "+Terraform" },
+      ["<leader>ctt"] = {
+        function()
+          require("telescope").extensions.terraform.state_list()
+        end,
+        "State List",
+      },
+      ["<leader>ctd"] = {
+        function()
+          require("telescope").extensions.terraform_doc.terraform_doc()
+        end,
+        "Provider Docs",
+      },
+      ["<leader>ctm"] = {
+        function()
+          require("telescope").extensions.terraform_doc.modules()
+        end,
+        "Modules",
+      },
+    })
   end,
   keys = {
     {
