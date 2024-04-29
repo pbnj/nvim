@@ -32,6 +32,33 @@ if vim.fn.executable("rg") then
   vim.opt.grepprg = "rg --vimgrep --smart-case $*"
 end
 
+if vim.g.neovide then
+  local font = { family = "Iosevka Nerd Font", size = 15 }
+  vim.opt.guifont = string.format("%s:h%s", font.family, font.size)
+  vim.keymap.set("n", "<D-0>", function()
+    font.size = 15
+    vim.opt.guifont = string.format("%s:h%s", font.family, font.size)
+  end)
+  vim.keymap.set("n", "<D-=>", function()
+    font.size = font.size + 1
+    vim.opt.guifont = string.format("%s:h%s", font.family, font.size)
+  end)
+  vim.keymap.set("n", "<D-->", function()
+    font.size = font.size - 1
+    vim.opt.guifont = string.format("%s:h%s", font.family, font.size)
+  end)
+  vim.keymap.set("!", "<D-v>", "<C-R>+")
+  vim.keymap.set("", "<D-v>", "+p<CR>")
+  vim.keymap.set("c", "<D-v>", "<C-R>+")
+  vim.keymap.set("i", "<D-v>", "<C-R>+")
+  vim.keymap.set("n", "<D-s>", ":w<CR>")
+  vim.keymap.set("n", "<D-v>", '"+P')
+  vim.keymap.set("n", "<D-a>", "ggVG")
+  vim.keymap.set("t", "<D-v>", "<C-R>+")
+  vim.keymap.set("v", "<D-c>", '"+y')
+  vim.keymap.set("v", "<D-v>", "<C-R>+")
+end
+
 -- [[ Keymaps ]]
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
@@ -99,6 +126,18 @@ vim.opt.rtp:prepend(lazypath)
 
 -- [[ Plugins ]]
 require("lazy").setup({
+  -- set cwd to git root
+  {
+    "echasnovski/mini.misc",
+    event = "VeryLazy",
+    cond = vim.g.neovide,
+    version = false,
+    config = function()
+      require("mini.misc").setup()
+      MiniMisc.setup_auto_root()
+    end,
+  },
+
   -- prevent nested neovim instances
   { "willothy/flatten.nvim", opts = {}, lazy = false, priority = 1001 },
 
@@ -114,11 +153,54 @@ require("lazy").setup({
   },
 
   -- tpope
-  { "tpope/vim-dadbod", event = "VeryLazy" },
-  { "tpope/vim-eunuch", event = "VeryLazy" },
+  { "tpope/vim-dadbod", cmd = { "DB" } },
+  {
+    "tpope/vim-eunuch",
+    cmd = {
+      "Move",
+      "Copy",
+      "Chmod",
+      "Mkdir",
+      "Rename",
+      "Delete",
+      "Cfind",
+      "Lfind",
+      "W",
+      "Wall",
+    },
+  },
   { "tpope/vim-rsi", event = "VeryLazy" },
   { "tpope/vim-sleuth", event = "VeryLazy" },
-  { "tpope/vim-unimpaired", event = "VeryLazy" },
+  -- { "tpope/vim-unimpaired", event = "VeryLazy" },
+  {
+    "tpope/vim-unimpaired",
+    keys = {
+      { "[a" },
+      { "]a" },
+      { "[A" },
+      { "]A" },
+      { "[b" },
+      { "]b" },
+      { "[B" },
+      { "]B" },
+      { "[e" },
+      { "]e" },
+      { "[ " },
+      { "] " },
+      { "[f" },
+      { "]f" },
+      { "[l" },
+      { "]l" },
+      { "[L" },
+      { "]L" },
+      { "[n" },
+      { "]n" },
+      { "[q" },
+      { "]q" },
+      { "[Q" },
+      { "]Q" },
+    },
+  },
   {
     "tpope/vim-fugitive",
     dependencies = { "tpope/vim-rhubarb" },
@@ -136,7 +218,7 @@ require("lazy").setup({
   },
 
   -- to be deprecated once neovim 0.10 (built-in commenting support) is released. see https://github.com/neovim/neovim/pull/28176
-  { "numToStr/Comment.nvim", event = "VeryLazy", opts = {} },
+  { "numToStr/Comment.nvim", keys = { { "gcc", "gbc" } }, opts = {} },
 
   -- fuzzy finder
   {
@@ -153,17 +235,10 @@ require("lazy").setup({
         end,
       },
       { "nvim-telescope/telescope-ui-select.nvim" },
-      { "nvim-telescope/telescope-file-browser.nvim" },
     },
     config = function()
       require("telescope").setup({
         extensions = {
-          file_browser = {
-            grouped = true,
-            hidden = true,
-            hide_parent_dir = true,
-            hijack_netrw = true,
-          },
           ["ui-select"] = {
             require("telescope.themes").get_dropdown(),
           },
@@ -184,13 +259,13 @@ require("lazy").setup({
         pickers = {
           find_files = {
             hidden = true,
+            no_ignore = true,
           },
         },
       })
       local telescope = require("telescope")
       pcall(telescope.load_extension, "fzf")
       pcall(telescope.load_extension, "ui-select")
-      pcall(telescope.load_extension, "file_browser")
       local builtin = require("telescope.builtin")
       vim.keymap.set(
         "n",
@@ -246,9 +321,9 @@ require("lazy").setup({
         builtin.buffers,
         { desc = "[F]ind existing [B]uffers" }
       )
-      vim.keymap.set("n", "<leader>fe", function()
-        telescope.extensions.file_browser.file_browser()
-      end, { desc = "[F]ile [E]xplorer" })
+      vim.keymap.set("n", "<leader>fp", function()
+        builtin.find_files({ cwd = "~/Projects/" })
+      end, { desc = "[F]ind [P]rojects" })
     end,
   },
 
@@ -355,7 +430,14 @@ require("lazy").setup({
         sources = {
           { name = "luasnip" },
           { name = "path" },
-          { name = "buffer" },
+          {
+            name = "buffer",
+            option = {
+              get_bufnrs = function()
+                return vim.api.nvim_list_bufs()
+              end,
+            },
+          },
           { name = "tmux" },
         },
       })
@@ -481,7 +563,24 @@ require("lazy").setup({
       })
     end,
   },
+  {
+    "nvim-lualine/lualine.nvim",
+    opts = {},
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+  },
   -- {import = 'custom.plugins'}
+}, {
+  performance = {
+    rtp = {
+      disabled_plugins = {
+        "gzip",
+        "tarPlugin",
+        "tohtml",
+        "tutor",
+        "zipPlugin",
+      },
+    },
+  },
 })
 
 -- [[ Filetypes ]]
