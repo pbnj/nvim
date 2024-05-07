@@ -28,35 +28,14 @@ vim.opt.undofile = true
 vim.opt.updatetime = 250
 vim.opt.wrap = false
 
-if vim.fn.executable("rg") then
-  vim.opt.grepprg = "rg --vimgrep --smart-case $*"
+if vim.fn.executable("fd") > 0 then
+  if vim.fn.isdirectory(".git") > 0 then
+    vim.opt.path = table.concat(vim.fn.systemlist("fd . --type d"), ",")
+  end
 end
 
-if vim.g.neovide then
-  local font = { family = "Iosevka Nerd Font", size = 15 }
-  vim.opt.guifont = string.format("%s:h%s", font.family, font.size)
-  vim.keymap.set("n", "<D-0>", function()
-    font.size = 15
-    vim.opt.guifont = string.format("%s:h%s", font.family, font.size)
-  end)
-  vim.keymap.set("n", "<D-=>", function()
-    font.size = font.size + 1
-    vim.opt.guifont = string.format("%s:h%s", font.family, font.size)
-  end)
-  vim.keymap.set("n", "<D-->", function()
-    font.size = font.size - 1
-    vim.opt.guifont = string.format("%s:h%s", font.family, font.size)
-  end)
-  vim.keymap.set("!", "<D-v>", "<C-R>+")
-  vim.keymap.set("", "<D-v>", "+p<CR>")
-  vim.keymap.set("c", "<D-v>", "<C-R>+")
-  vim.keymap.set("i", "<D-v>", "<C-R>+")
-  vim.keymap.set("n", "<D-s>", ":w<CR>")
-  vim.keymap.set("n", "<D-v>", '"+P')
-  vim.keymap.set("n", "<D-a>", "ggVG")
-  vim.keymap.set("t", "<D-v>", "<C-R>+")
-  vim.keymap.set("v", "<D-c>", '"+y')
-  vim.keymap.set("v", "<D-v>", "<C-R>+")
+if vim.fn.executable("rg") > 0 then
+  vim.opt.grepprg = "rg --vimgrep --smart-case $*"
 end
 
 -- [[ Keymaps ]]
@@ -96,6 +75,10 @@ vim.keymap.set(
   { desc = "Exit terminal mode" }
 )
 
+-- vim commandline ctrl-n/p cycle through history
+vim.keymap.set("c", "<c-n>", "<c-Down>")
+vim.keymap.set("c", "<c-p>", "<c-Up>")
+
 -- [[ Autocommands ]]
 -- Highlight yanked text
 vim.api.nvim_create_autocmd("TextYankPost", {
@@ -126,17 +109,6 @@ vim.opt.rtp:prepend(lazypath)
 
 -- [[ Plugins ]]
 require("lazy").setup({
-  -- set cwd to git root
-  {
-    "echasnovski/mini.misc",
-    event = "VeryLazy",
-    cond = vim.g.neovide,
-    version = false,
-    config = function()
-      require("mini.misc").setup()
-      MiniMisc.setup_auto_root()
-    end,
-  },
 
   -- prevent nested neovim instances
   { "willothy/flatten.nvim", opts = {}, lazy = false, priority = 1001 },
@@ -145,33 +117,31 @@ require("lazy").setup({
   {
     "akinsho/toggleterm.nvim",
     version = "*",
-    keys = {
-      [[<c-\>]],
-      desc = "Toggle terminal",
-    },
+    keys = { [[<c-\>]] },
     opts = { open_mapping = [[<c-\>]] },
   },
 
   -- tpope
   { "tpope/vim-dadbod", cmd = { "DB" } },
+  { "tpope/vim-vinegar", event = "VeryLazy" },
   {
     "tpope/vim-eunuch",
     cmd = {
-      "Move",
-      "Copy",
-      "Chmod",
-      "Mkdir",
-      "Rename",
-      "Delete",
       "Cfind",
+      "Chmod",
+      "Copy",
+      "Delete",
       "Lfind",
+      "Mkdir",
+      "Move",
+      "Remove",
+      "Rename",
       "W",
       "Wall",
     },
   },
   { "tpope/vim-rsi", event = "VeryLazy" },
   { "tpope/vim-sleuth", event = "VeryLazy" },
-  -- { "tpope/vim-unimpaired", event = "VeryLazy" },
   {
     "tpope/vim-unimpaired",
     keys = {
@@ -204,7 +174,7 @@ require("lazy").setup({
   {
     "tpope/vim-fugitive",
     dependencies = { "tpope/vim-rhubarb" },
-    cmd = { "G", "Gw", "Gwrite", "GB", "GBrowse" },
+    cmd = { "G", "Git", "Gwrite", "GBrowse" },
     keys = {
       { "<leader>gg", vim.cmd.Git, desc = "[G]it client (fugitive)" },
       {
@@ -218,7 +188,11 @@ require("lazy").setup({
   },
 
   -- to be deprecated once neovim 0.10 (built-in commenting support) is released. see https://github.com/neovim/neovim/pull/28176
-  { "numToStr/Comment.nvim", keys = { { "gcc", "gbc" } }, opts = {} },
+  {
+    "numToStr/Comment.nvim",
+    keys = { "gcc", "gcip", { "gc", mode = { "v" } } },
+    opts = {},
+  },
 
   -- fuzzy finder
   {
@@ -292,6 +266,12 @@ require("lazy").setup({
         { desc = "[F]ind current [W]ord" }
       )
       vim.keymap.set(
+        "v",
+        "<leader>fw",
+        "y:Telescope live_grep default_text=<c-r>0<cr>",
+        { desc = "[F]ind current [W]ord" }
+      )
+      vim.keymap.set(
         "n",
         "<leader>fg",
         builtin.live_grep,
@@ -360,7 +340,12 @@ require("lazy").setup({
       lint.linters_by_ft = {
         dockerfile = { "hadolint" },
         markdown = { "markdownlint" },
-        terraform = { "tflint" },
+        terraform = { "tflint", "snyk_iac" },
+        rego = { "opa_check" },
+        python = { "ruff" },
+        sh = { "shellcheck" },
+        bash = { "shellcheck" },
+        yaml = { "yamllint" },
       }
       -- auto-run linters on certain vim events
       local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
@@ -379,10 +364,11 @@ require("lazy").setup({
   -- Autocompletion
   {
     "hrsh7th/nvim-cmp",
-    event = "InsertEnter",
+    event = "VeryLazy",
     dependencies = {
       {
         "L3MON4D3/LuaSnip",
+        event = "InsertEnter",
         build = (function()
           if vim.fn.has("win32") == 1 or vim.fn.executable("make") == 0 then
             return
@@ -401,6 +387,7 @@ require("lazy").setup({
       "saadparwaiz1/cmp_luasnip",
       "hrsh7th/cmp-path",
       "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-cmdline",
       "andersevenrud/cmp-tmux",
     },
     config = function()
@@ -408,7 +395,7 @@ require("lazy").setup({
       local luasnip = require("luasnip")
       luasnip.config.setup({})
       cmp.setup({
-        -- completion = { completeopt = "menu,menuone,noinsert" },
+        completion = { completeopt = "menu,noselect" },
         mapping = cmp.mapping.preset.insert({
           ["<C-n>"] = cmp.mapping.select_next_item(),
           ["<C-p>"] = cmp.mapping.select_prev_item(),
@@ -440,6 +427,25 @@ require("lazy").setup({
           },
           { name = "tmux" },
         },
+      })
+      cmp.setup.cmdline({ "/", "?" }, {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = {
+          { name = "buffer" },
+        },
+      })
+      cmp.setup.cmdline(":", {
+        -- C-n/C-p cycle through completions if a character has been typed and through
+        -- command history if not (from https://www.reddit.com/r/neovim/comments/v5pfmy/comment/ibb61w3/)
+        mapping = cmp.mapping.preset.cmdline({
+          ["<C-n>"] = { c = cmp.mapping.select_next_item() },
+          ["<C-p>"] = { c = cmp.mapping.select_prev_item() },
+        }),
+        sources = cmp.config.sources({
+          { name = "path" },
+        }, {
+          { name = "cmdline" },
+        }),
       })
     end,
   },
@@ -548,6 +554,7 @@ require("lazy").setup({
           "gotestsum",
           "hadolint",
           "jq",
+          "luacheck",
           "markdown-toc",
           "markdownlint",
           "prettier",
@@ -556,6 +563,7 @@ require("lazy").setup({
           "shellcheck",
           "snyk",
           "stylua",
+          "tflint",
           "trivy",
           "trufflehog",
           "yamllint",
