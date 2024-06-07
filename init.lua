@@ -3,9 +3,6 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
-vim.g.loaded_tohtml_plugin = 1
-vim.g.netrw_keepdir = 0
-
 -- [[ Options ]]
 vim.opt.breakindent = true
 vim.opt.clipboard = "unnamedplus"
@@ -14,12 +11,13 @@ vim.opt.fillchars = { vert = "│", stl = "─", stlnc = "═" }
 vim.opt.hlsearch = true
 vim.opt.ignorecase = true
 vim.opt.inccommand = "split"
+vim.opt.iskeyword:append("-")
 vim.opt.list = true
-vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
+vim.opt.listchars = { tab = "│ ", trail = "·", nbsp = "␣" }
 vim.opt.mouse = "a"
 vim.opt.number = true
 vim.opt.scrolloff = 10
-vim.opt.shortmess = vim.opt.shortmess + "I"
+vim.opt.shortmess:append("I")
 vim.opt.showmode = false
 vim.opt.signcolumn = "yes"
 vim.opt.smartcase = true
@@ -27,12 +25,7 @@ vim.opt.timeoutlen = 300
 vim.opt.undofile = true
 vim.opt.updatetime = 250
 vim.opt.wrap = false
-
-if vim.fn.executable("fd") > 0 then
-  if vim.fn.isdirectory(".git") > 0 then
-    vim.opt.path = table.concat(vim.fn.systemlist("fd . --type d"), ",")
-  end
-end
+vim.g.editorconfig = true
 
 if vim.fn.executable("rg") > 0 then
   vim.opt.grepprg = "rg --vimgrep --smart-case $*"
@@ -42,18 +35,6 @@ end
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
 -- Diagnostic keymaps
-vim.keymap.set(
-  "n",
-  "[d",
-  vim.diagnostic.goto_prev,
-  { desc = "Go to previous [D]iagnostic message" }
-)
-vim.keymap.set(
-  "n",
-  "]d",
-  vim.diagnostic.goto_next,
-  { desc = "Go to next [D]iagnostic message" }
-)
 vim.keymap.set(
   "n",
   "<leader>e",
@@ -92,6 +73,33 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   end,
 })
 
+-- Generate Ctags after saving a file
+if vim.fn.executable("ctags") > 0 then
+  vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+    desc = "Generate Ctags after saving a file",
+    pattern = { "*.go", "*.rs", "*.py", "*.tf", "*.json", ".yaml", "*.md" },
+    group = vim.api.nvim_create_augroup("pbnj-generate-tags", { clear = true }),
+    callback = function()
+      vim.system({ "ctags", "-R", "." })
+    end,
+  })
+end
+
+-- Set path dynamically based on git files
+if vim.fn.isdirectory(".git") > 0 then
+  vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
+    desc = "Set path dynamically based on git files",
+    pattern = { "*" },
+    group = vim.api.nvim_create_augroup("pbnj-set-path", { clear = true }),
+    callback = function()
+      vim.opt.path = table.concat(
+        vim.fn.systemlist("git ls-tree -d --name-only -r HEAD"),
+        ","
+      )
+    end,
+  })
+end
+
 -- [[ Plugin Manager ]]
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
@@ -109,21 +117,30 @@ vim.opt.rtp:prepend(lazypath)
 
 -- [[ Plugins ]]
 require("lazy").setup({
-
   -- prevent nested neovim instances
   { "willothy/flatten.nvim", opts = {}, lazy = false, priority = 1001 },
 
-  -- integrated terminal
-  {
-    "akinsho/toggleterm.nvim",
-    version = "*",
-    keys = { [[<c-\>]] },
-    opts = { open_mapping = [[<c-\>]] },
-  },
-
   -- tpope
-  { "tpope/vim-dadbod", cmd = { "DB" } },
-  { "tpope/vim-vinegar", event = "VeryLazy" },
+  {
+    "kristijanhusak/vim-dadbod-ui",
+    dependencies = {
+      { "tpope/vim-dadbod" },
+      {
+        "kristijanhusak/vim-dadbod-completion",
+        ft = { "sql", "mysql", "plsql" },
+      },
+    },
+    cmd = {
+      "DBUI",
+      "DBUIToggle",
+      "DBUIAddConnection",
+      "DBUIFindBuffer",
+    },
+    config = function()
+      vim.g.db_ui_use_nerd_fonts = 1
+    end,
+  },
+  { "tpope/vim-dispatch", cmd = { "Dispatch", "Start", "Spawn", "Make" } },
   {
     "tpope/vim-eunuch",
     cmd = {
@@ -138,6 +155,21 @@ require("lazy").setup({
       "Rename",
       "W",
       "Wall",
+    },
+  },
+  {
+    "tpope/vim-fugitive",
+    dependencies = { "tpope/vim-rhubarb", "sindrets/diffview.nvim" },
+    cmd = { "G", "Git", "Gwrite", "GBrowse" },
+    keys = {
+      { "<leader>gg", vim.cmd.Git, desc = "[G]it client (fugitive)" },
+      {
+        "<leader>gb",
+        vim.cmd.GBrowse,
+        desc = "[G]it [B]rowse",
+        mode = { "n", "v" },
+      },
+      { "<leader>gw", vim.cmd.GWrite, desc = "[GW]rite (git add)" },
     },
   },
   { "tpope/vim-rsi", event = "VeryLazy" },
@@ -171,28 +203,7 @@ require("lazy").setup({
       { "]Q" },
     },
   },
-  {
-    "tpope/vim-fugitive",
-    dependencies = { "tpope/vim-rhubarb" },
-    cmd = { "G", "Git", "Gwrite", "GBrowse" },
-    keys = {
-      { "<leader>gg", vim.cmd.Git, desc = "[G]it client (fugitive)" },
-      {
-        "<leader>gb",
-        vim.cmd.GBrowse,
-        desc = "[G]it [B]rowse",
-        mode = { "n", "v" },
-      },
-      { "<leader>gw", vim.cmd.GWrite, desc = "[GW]rite (git add)" },
-    },
-  },
-
-  -- to be deprecated once neovim 0.10 (built-in commenting support) is released. see https://github.com/neovim/neovim/pull/28176
-  {
-    "numToStr/Comment.nvim",
-    keys = { "gcc", "gcip", { "gc", mode = { "v" } } },
-    opts = {},
-  },
+  { "tpope/vim-vinegar", event = "VeryLazy" },
 
   -- fuzzy finder
   {
@@ -200,7 +211,7 @@ require("lazy").setup({
     event = "VimEnter",
     branch = "0.1.x",
     dependencies = {
-      "nvim-lua/plenary.nvim",
+      { "nvim-lua/plenary.nvim" },
       {
         "nvim-telescope/telescope-fzf-native.nvim",
         build = "make",
@@ -209,6 +220,7 @@ require("lazy").setup({
         end,
       },
       { "nvim-telescope/telescope-ui-select.nvim" },
+      { "nvim-telescope/telescope-github.nvim" },
     },
     config = function()
       require("telescope").setup({
@@ -240,10 +252,11 @@ require("lazy").setup({
       local telescope = require("telescope")
       pcall(telescope.load_extension, "fzf")
       pcall(telescope.load_extension, "ui-select")
+      pcall(telescope.load_extension, "gh")
       local builtin = require("telescope.builtin")
       vim.keymap.set(
         "n",
-        "<leader>sh",
+        "<leader>fh",
         builtin.help_tags,
         { desc = "[S]earch [H]elp" }
       )
@@ -273,12 +286,6 @@ require("lazy").setup({
       )
       vim.keymap.set(
         "n",
-        "<leader>fg",
-        builtin.live_grep,
-        { desc = "[F]ind by [G]rep" }
-      )
-      vim.keymap.set(
-        "n",
         "<leader>fd",
         builtin.diagnostics,
         { desc = "[F]ind [D]iagnostic" }
@@ -288,6 +295,12 @@ require("lazy").setup({
         "<leader>fr",
         builtin.resume,
         { desc = "[F]ind [R]esume" }
+      )
+      vim.keymap.set(
+        "n",
+        "<leader>ft",
+        builtin.tags,
+        { desc = "[F]ind [T]ags" }
       )
       vim.keymap.set(
         "n",
@@ -304,6 +317,12 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>fp", function()
         builtin.find_files({ cwd = "~/Projects/" })
       end, { desc = "[F]ind [P]rojects" })
+      vim.keymap.set(
+        "n",
+        "<leader>/",
+        builtin.live_grep,
+        { desc = "[F]ind by [G]rep" }
+      )
     end,
   },
 
@@ -345,7 +364,6 @@ require("lazy").setup({
         python = { "ruff" },
         sh = { "shellcheck" },
         bash = { "shellcheck" },
-        yaml = { "yamllint" },
       }
       -- auto-run linters on certain vim events
       local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
@@ -387,7 +405,6 @@ require("lazy").setup({
       "saadparwaiz1/cmp_luasnip",
       "hrsh7th/cmp-path",
       "hrsh7th/cmp-buffer",
-      "hrsh7th/cmp-cmdline",
       "andersevenrud/cmp-tmux",
     },
     config = function()
@@ -427,25 +444,6 @@ require("lazy").setup({
           },
           { name = "tmux" },
         },
-      })
-      cmp.setup.cmdline({ "/", "?" }, {
-        mapping = cmp.mapping.preset.cmdline(),
-        sources = {
-          { name = "buffer" },
-        },
-      })
-      cmp.setup.cmdline(":", {
-        -- C-n/C-p cycle through completions if a character has been typed and through
-        -- command history if not (from https://www.reddit.com/r/neovim/comments/v5pfmy/comment/ibb61w3/)
-        mapping = cmp.mapping.preset.cmdline({
-          ["<C-n>"] = { c = cmp.mapping.select_next_item() },
-          ["<C-p>"] = { c = cmp.mapping.select_prev_item() },
-        }),
-        sources = cmp.config.sources({
-          { name = "path" },
-        }, {
-          { name = "cmdline" },
-        }),
       })
     end,
   },
@@ -544,7 +542,6 @@ require("lazy").setup({
       require("mason").setup()
       require("mason-tool-installer").setup({
         ensure_installed = {
-          "actionlint",
           "doctoc",
           "gh",
           "gitleaks",
@@ -554,29 +551,28 @@ require("lazy").setup({
           "gotestsum",
           "hadolint",
           "jq",
-          "luacheck",
           "markdown-toc",
           "markdownlint",
           "prettier",
           "prettierd",
           "ruff",
           "shellcheck",
+          "shfmt",
           "snyk",
           "stylua",
           "tflint",
           "trivy",
           "trufflehog",
-          "yamllint",
         },
       })
     end,
   },
+
   {
     "nvim-lualine/lualine.nvim",
     opts = {},
     dependencies = { "nvim-tree/nvim-web-devicons" },
   },
-  -- {import = 'custom.plugins'}
 }, {
   performance = {
     rtp = {
